@@ -26,14 +26,10 @@ class WebserviceUserProvider implements UserProviderInterface
 
         if ($userData && isset($userData['users'])) {
 
-            foreach ($userData['users'] as $user) {
+            $findUser = $this->findUserInArray($userData['users'], $username);
 
-                if ($user['username'] === $username) {
-                    $password = $user['password'];
-                    $roles = ['ROLE_USER'];
-
-                    return new WebserviceUser($username, $password, false, $roles);
-                }
+            if ($findUser) {
+                return new WebserviceUser($username, $findUser['password'], false, ['ROLE_USER']);
             }
         }
 
@@ -56,5 +52,18 @@ class WebserviceUserProvider implements UserProviderInterface
     public function supportsClass($class)
     {
         return $class === 'AppBundle\Security\User\WebserviceUser';
+    }
+
+    public function findUserInArray($users, $username)
+    {
+        $userInfo = false;
+
+        foreach ($users as $user) {
+            if ($user['username'] === $username) {
+                $userInfo = $user;
+            }
+        }
+
+        return $userInfo;
     }
 }
