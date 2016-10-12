@@ -1,0 +1,12 @@
+{
+   "users" : [
+      {
+         "username" : "vasia",
+         "password":"$2y$13$sftI8EpjatS94DfjmOW48.yjKxC.Yt.blcZFfW.y7cQoPHSqFPwOC"
+      },
+      {
+         "username" : "stepan",
+         "password":"$2y$13$sftI8EpjatS94DfjmOW48.yjKxC.Yt.blcZFfW.y7cQoPHSqFPwOC"
+      }
+   ]
+}
