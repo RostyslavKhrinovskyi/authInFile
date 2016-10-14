@@ -7,4 +7,4 @@ services:
 services:
     app.webservice_user_provider:
         class: AppBundle\Security\User\WebserviceUserProvider
-        arguments: ['@kernel']
+        arguments: ["@service_container"]

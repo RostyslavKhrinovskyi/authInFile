@@ -2,6 +2,7 @@
 
 namespace AppBundle\Security\User;
 
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -10,15 +11,33 @@ use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 
 class WebserviceUserProvider implements UserProviderInterface
 {
+    /**
+     * @var Container
+     */
+    private $container;
 
+    /**
+     * WebserviceUserProvider constructor.
+     * @param Container $container
+     */
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * @param string $username
+     * @return WebserviceUser
+     */
     public function loadUserByUsername($username)
     {
+        $userData = null;
         $finder = new Finder();
 
         $finder
-            ->in(__DIR__ . '/../User/Data')
+            ->in($this->container->getParameter('userdata_path'))
             ->files()
-            ->name('users.txt');
+            ->name($this->container->getParameter('userdata_file'));
 
         foreach ($finder as $file) {
             $userData = json_decode($file->getContents(), true);
@@ -38,6 +57,10 @@ class WebserviceUserProvider implements UserProviderInterface
         );
     }
 
+    /**
+     * @param UserInterface $user
+     * @return WebserviceUser
+     */
     public function refreshUser(UserInterface $user)
     {
         if (!$user instanceof WebserviceUser) {
@@ -54,7 +77,12 @@ class WebserviceUserProvider implements UserProviderInterface
         return $class === 'AppBundle\Security\User\WebserviceUser';
     }
 
-    public function findUserInArray($users, $username)
+    /**
+     * @param $users
+     * @param $username
+     * @return bool
+     */
+    private function findUserInArray($users, $username)
     {
         $userInfo = false;
 
