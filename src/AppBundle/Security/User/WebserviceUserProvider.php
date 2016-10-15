@@ -14,15 +14,15 @@ class WebserviceUserProvider implements UserProviderInterface
     /**
      * @var Container
      */
-    private $container;
+    private $finder;
 
     /**
      * WebserviceUserProvider constructor.
      * @param Container $container
      */
-    public function __construct(Container $container)
+    public function __construct(Finder $finder)
     {
-        $this->container = $container;
+        $this->finder = $finder;
     }
 
     /**
@@ -32,14 +32,8 @@ class WebserviceUserProvider implements UserProviderInterface
     public function loadUserByUsername($username)
     {
         $userData = null;
-        $finder = new Finder();
 
-        $finder
-            ->in($this->container->getParameter('userdata_path'))
-            ->files()
-            ->name($this->container->getParameter('userdata_file'));
-
-        foreach ($finder as $file) {
+        foreach ($this->finder as $file) {
             $userData = json_decode($file->getContents(), true);
         }
 
@@ -80,7 +74,7 @@ class WebserviceUserProvider implements UserProviderInterface
     /**
      * @param $users
      * @param $username
-     * @return bool
+     * @return array
      */
     private function findUserInArray($users, $username)
     {

@@ -5,6 +5,8 @@ parameters:
 
     userdata_path: "%kernel.root_dir%/Resources/data"
     userdata_file: "users.txt"
+    limit_try_login: 5
+    limit_seconds_login: 20
 
     mailer_transport:  smtp
     mailer_host:       127.0.0.1

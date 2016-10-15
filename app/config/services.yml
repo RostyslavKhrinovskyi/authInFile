@@ -4,7 +4,13 @@ parameters:
 #    parameter_name: value
 
 services:
-services:
+    user.file.finder:
+            class: Symfony\Component\Finder\Finder
+            calls:
+                - [in, ['%userdata_path%']]
+                - [files, []]
+                - [name, ['%userdata_file%']]
+
     app.webservice_user_provider:
         class: AppBundle\Security\User\WebserviceUserProvider
-        arguments: ["@service_container"]
+        arguments: ["@user.file.finder"]

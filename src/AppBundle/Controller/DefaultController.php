@@ -6,6 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\User\User;
 
 
@@ -27,13 +28,36 @@ class DefaultController extends Controller
      */
     public function loginAction(Request $request)
     {
+
         if ($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY')) {
             return $this->redirect($this->generateUrl('homepage'));
+        }
+
+        $session = $this->get('session');
+
+        if (date('U') > $session->get('time') + $this->getParameter('limit_seconds_login')) {
+            $session->set('limit', $this->getParameter('limit_try_login'));
         }
 
         $authenticationUtils = $this->get('security.authentication_utils');
 
         $error = $authenticationUtils->getLastAuthenticationError();
+
+        if ($error) {
+            $session->set('time', date('U'));
+
+            $limit = $session->get('limit');
+            $limit--;
+
+            if ($limit < 0) {
+                $countSeconds = $session->get('time') + $this->getParameter('limit_seconds_login') - date('U');
+                $errorMessage = 'Try after ' . $countSeconds . ' seconds';
+                $error = new CustomUserMessageAuthenticationException($errorMessage);
+            }
+            
+            $session->set('limit', $limit);
+        }
+
 
         $lastUsername = $authenticationUtils->getLastUsername();
 
