@@ -12,13 +12,13 @@ use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 class WebserviceUserProvider implements UserProviderInterface
 {
     /**
-     * @var Container
+     * @var Finder
      */
     private $finder;
 
     /**
      * WebserviceUserProvider constructor.
-     * @param Container $container
+     * @param Finder $finder
      */
     public function __construct(Finder $finder)
     {
@@ -37,13 +37,10 @@ class WebserviceUserProvider implements UserProviderInterface
             $userData = json_decode($file->getContents(), true);
         }
 
-        if ($userData && isset($userData['users'])) {
+        $foundUser = $this->findUserInArray($userData['users'], $username);
 
-            $findUser = $this->findUserInArray($userData['users'], $username);
-
-            if ($findUser) {
-                return new WebserviceUser($username, $findUser['password'], false, ['ROLE_USER']);
-            }
+        if ($foundUser) {
+            return new WebserviceUser($username, $foundUser['password'], false, ['ROLE_USER']);
         }
 
         throw new UsernameNotFoundException(
