@@ -35,15 +35,16 @@ class DefaultController extends Controller
 
         $session = $this->get('session');
 
-        if (date('U') > $session->get('time') + $this->getParameter('limit_seconds_login')) {
-            $session->set('limit', $this->getParameter('limit_try_login'));
-        }
-
         $authenticationUtils = $this->get('security.authentication_utils');
 
         $error = $authenticationUtils->getLastAuthenticationError();
 
         if ($error) {
+
+            if (date('U') > $session->get('time') + $this->getParameter('limit_seconds_login')) {
+                $session->set('limit', $this->getParameter('limit_try_login'));
+            }
+
             $session->set('time', date('U'));
 
             $limit = $session->get('limit');
@@ -54,7 +55,7 @@ class DefaultController extends Controller
                 $errorMessage = 'Try after ' . $countSeconds . ' seconds';
                 $error = new CustomUserMessageAuthenticationException($errorMessage);
             }
-            
+
             $session->set('limit', $limit);
         }
 
