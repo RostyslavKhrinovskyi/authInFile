@@ -30,3 +30,12 @@
 
  /* Для заданной категории получить ее полный путь в дереве (breadcrumb, «хлебные крошки»). */
 
+ SELECT
+   (SELECT GROUP_CONCAT(parent.name SEPARATOR ' > ')
+   FROM categories parent
+   WHERE node.left_key >= parent.left_key
+   AND node.right_key <= parent.right_key
+   ORDER BY left_key
+   ) as breadcrumb
+ FROM categories node
+ ORDER BY left_key
